@@ -28,7 +28,7 @@ export type msgOptions = ChatInputCommandInteraction["options"] | ContextMenuCom
  * @param options The interaction options to use, otherwise known as arguments.
  * @param defer Should we tell Discord to give us more time?
 */
-export default class InteractionMessage {
+export class InteractionMessage {
   private readonly interaction: Interaction;
   private readonly interactionOptions: msgOptions;
   private ephemeral: boolean;
