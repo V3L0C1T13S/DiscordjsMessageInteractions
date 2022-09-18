@@ -16,6 +16,8 @@ import {
   cleanContent,
   Client,
   ChannelType,
+  MessageOptions,
+  BitFieldResolvable,
 } from "discord.js";
 import { MentionsArray } from "./MentionsArray";
 
@@ -126,16 +128,26 @@ export class InteractionMessage {
     this.client = this.interaction.client;
   }
 
-  private createReplyMsg(content: string | MessagePayload) {
+  private createReplyMsg(content: string | MessageOptions): InteractionReplyOptions {
     if (typeof content === "string") return { content };
 
-    return content as unknown as InteractionReplyOptions;
+    return {
+      tts: content.tts,
+      content: content.content,
+      nonce: content.nonce,
+      embeds: content.embeds,
+      components: content.components,
+      allowedMentions: content.allowedMentions,
+      files: content.files,
+      attachments: content.attachments,
+      flags: content.flags as BitFieldResolvable<"SuppressEmbeds" | "Ephemeral", number>,
+    };
   }
 
   /**
    * Replies to the interaction
    * */
-  async reply(content: string | MessagePayload): Promise<InteractionMessage> {
+  async reply(content: string | MessageOptions): Promise<InteractionMessage> {
     if (!this.interaction.isCommand()) throw new Error("Not a command");
 
     if (this.defer) {
@@ -187,7 +199,7 @@ export class InteractionMessage {
     return this;
   }
 
-  async edit(content: string | MessagePayload): Promise<InteractionMessage> {
+  async edit(content: string | MessageOptions): Promise<InteractionMessage> {
     if (!this.interaction.isCommand()) throw new Error("Not a command");
 
     if (!this.responded) throw new Error("Not responded");
