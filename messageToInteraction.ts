@@ -11,9 +11,13 @@ import {
   cleanContent,
   Client,
   ChannelType,
-  MessageOptions,
+  MessageCreateOptions,
   BitFieldResolvable,
   CommandInteraction,
+  Collection,
+  Snowflake,
+  Attachment,
+  ApplicationCommandOptionType,
 } from "discord.js";
 import { MentionsArray } from "./MentionsArray";
 
@@ -35,6 +39,8 @@ export class InteractionMessage {
   private channelFaked = false;
 
   applicationId?: string;
+
+  attachments: Collection<Snowflake, Attachment> = new Collection();
 
   author: User;
 
@@ -122,20 +128,24 @@ export class InteractionMessage {
     this.channelId = this.channel.id;
 
     this.client = this.interaction.client;
+
+    options.data.forEach((value) => {
+      if (value.type === ApplicationCommandOptionType.Attachment && value.attachment) {
+        this.attachments.set(value.attachment.id, value.attachment);
+      }
+    });
   }
 
-  private createReplyMsg(content: string | MessageOptions): InteractionReplyOptions {
+  private createReplyMsg(content: string | MessageCreateOptions): InteractionReplyOptions {
     if (typeof content === "string") return { content };
 
     return {
       tts: content.tts,
       content: content.content,
-      nonce: content.nonce,
       embeds: content.embeds,
       components: content.components,
       allowedMentions: content.allowedMentions,
       files: content.files,
-      attachments: content.attachments,
       flags: content.flags as BitFieldResolvable<"SuppressEmbeds" | "Ephemeral", number>,
     };
   }
@@ -143,7 +153,7 @@ export class InteractionMessage {
   /**
    * Replies to the interaction
    * */
-  async reply(content: string | MessageOptions) {
+  async reply(content: string | MessageCreateOptions) {
     if (this.defer) {
       const res = await this.edit(content);
       return res;
@@ -191,11 +201,27 @@ export class InteractionMessage {
     return this;
   }
 
-  async edit(content: string | MessageOptions) {
+  async edit(content: string | MessageCreateOptions) {
     if (!this.responded) throw new Error("Not responded");
 
     const finalMsg = this.createReplyMsg(content);
     await this.interaction.editReply(finalMsg);
+    return this;
+  }
+
+  async pin() {
+    return this;
+  }
+
+  async react() {
+    return undefined;
+  }
+
+  async removeAttachments() {
+    return this;
+  }
+
+  async unpin() {
     return this;
   }
 
