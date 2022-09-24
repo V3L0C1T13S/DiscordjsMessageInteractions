@@ -1,17 +1,17 @@
 import {
   ApplicationCommandOptionType,
-  Collection, Interaction, Snowflake, User,
+  Collection, CommandInteraction, Snowflake, User,
 } from "discord.js";
 import { msgOptions } from "./messageToInteraction";
 
 export class MentionsArray {
-  private interaction: Interaction;
+  private interaction: CommandInteraction;
 
   private options: msgOptions;
 
   users: Collection<Snowflake, User>;
 
-  constructor(interaction: Interaction, options: msgOptions) {
+  constructor(interaction: CommandInteraction, options: msgOptions) {
     this.interaction = interaction;
     this.options = options;
 

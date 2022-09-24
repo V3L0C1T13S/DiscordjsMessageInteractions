@@ -1,16 +1,11 @@
 import {
-  Collection,
   DMChannel,
   Guild,
   GuildMember,
-  Interaction,
   InteractionReplyOptions,
-  MessagePayload,
-  Snowflake,
   TextBasedChannel,
   User,
   APIInteractionGuildMember,
-  ApplicationCommandOptionType,
   ChatInputCommandInteraction,
   ContextMenuCommandInteraction,
   cleanContent,
@@ -18,6 +13,7 @@ import {
   ChannelType,
   MessageOptions,
   BitFieldResolvable,
+  CommandInteraction,
 } from "discord.js";
 import { MentionsArray } from "./MentionsArray";
 
@@ -31,7 +27,7 @@ export type msgOptions = ChatInputCommandInteraction["options"] | ContextMenuCom
  * @param defer Should we tell Discord to give us more time?
 */
 export class InteractionMessage {
-  private readonly interaction: Interaction;
+  private readonly interaction: CommandInteraction;
   private readonly interactionOptions: msgOptions;
   private ephemeral: boolean;
   private responded = false;
@@ -88,11 +84,11 @@ export class InteractionMessage {
 
   private readonly defer: boolean;
 
-  constructor(interaction: Interaction, ephemeral: boolean, options: msgOptions, defer = true) {
+  constructor(interaction: CommandInteraction, ephemeral: boolean, options: msgOptions) {
     this.interaction = interaction;
     this.ephemeral = ephemeral;
     this.interactionOptions = options;
-    this.defer = !!defer;
+    this.defer = interaction.deferred;
     this.responded = this.defer;
 
     this.channel = this.interaction.channel || (() => {
@@ -147,9 +143,7 @@ export class InteractionMessage {
   /**
    * Replies to the interaction
    * */
-  async reply(content: string | MessageOptions): Promise<InteractionMessage> {
-    if (!this.interaction.isCommand()) throw new Error("Not a command");
-
+  async reply(content: string | MessageOptions) {
     if (this.defer) {
       const res = await this.edit(content);
       return res;
@@ -187,9 +181,7 @@ export class InteractionMessage {
    * Deletes the reply for our interaction,
    * (but only if we've responded and this isnt an ephemeral reply)
    * */
-  async delete(timeout?: number): Promise<InteractionMessage> {
-    if (!this.interaction.isCommand()) throw new Error("Not a command");
-
+  async delete() {
     if (!this.responded) throw new Error("Not responded");
     // not sure if this is gonna cause issues in the future but for now we'll just ignore it
     if (this.ephemeral) return this;
@@ -199,9 +191,7 @@ export class InteractionMessage {
     return this;
   }
 
-  async edit(content: string | MessageOptions): Promise<InteractionMessage> {
-    if (!this.interaction.isCommand()) throw new Error("Not a command");
-
+  async edit(content: string | MessageOptions) {
     if (!this.responded) throw new Error("Not responded");
 
     const finalMsg = this.createReplyMsg(content);
