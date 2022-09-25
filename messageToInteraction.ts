@@ -58,6 +58,8 @@ export class InteractionMessage {
 
   guild?: Guild;
 
+  guildId: string | null;
+
   content: string;
 
   readonly createdAt: Date;
@@ -134,6 +136,8 @@ export class InteractionMessage {
         this.attachments.set(value.attachment.id, value.attachment);
       }
     });
+
+    this.guildId = interaction.guildId;
   }
 
   private createReplyMsg(content: string | MessageCreateOptions): InteractionReplyOptions {
