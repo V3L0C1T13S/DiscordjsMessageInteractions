@@ -1,6 +1,6 @@
 import {
   ApplicationCommandOptionType,
-  Collection, CommandInteraction, Snowflake, User,
+  Collection, CommandInteraction, GuildMember, Snowflake, User,
 } from "discord.js";
 import { msgOptions } from "./messageToInteraction";
 
@@ -10,6 +10,8 @@ export class MentionsArray {
   private options: msgOptions;
 
   users: Collection<Snowflake, User>;
+
+  members: Collection<Snowflake, GuildMember> = new Collection();
 
   constructor(interaction: CommandInteraction, options: msgOptions) {
     this.interaction = interaction;
