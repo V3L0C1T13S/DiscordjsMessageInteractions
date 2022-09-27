@@ -11,7 +11,21 @@ export class MentionsArray {
 
   users: Collection<Snowflake, User>;
 
-  members: Collection<Snowflake, GuildMember> = new Collection();
+  _members?: Collection<Snowflake, GuildMember>;
+
+  get members() {
+    if (this._members) return this._members;
+    if (!this.interaction.guild) return null;
+
+    this._members = new Collection();
+
+    this.users.forEach((user) => {
+      const member = this.interaction.guild?.members.resolve(user);
+      if (member) this._members?.set(member.id, member);
+    });
+
+    return this._members;
+  }
 
   constructor(interaction: CommandInteraction, options: msgOptions) {
     this.interaction = interaction;
