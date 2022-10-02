@@ -1,10 +1,18 @@
 import {
   ApplicationCommandOptionType,
-  Collection, CommandInteraction, GuildMember, Snowflake, User,
+  Collection, CommandInteraction, GuildMember, MessageMentions, Snowflake, User,
 } from "discord.js";
 import { msgOptions } from "./messageToInteraction";
 
 export class MentionsArray {
+  static EveryonePattern = MessageMentions.EveryonePattern;
+
+  static ChannelsPattern = MessageMentions.ChannelsPattern;
+
+  static RolesPattern = MessageMentions.RolesPattern;
+
+  static UsersPattern = MessageMentions.UsersPattern;
+
   private interaction: CommandInteraction;
 
   private options: msgOptions;
